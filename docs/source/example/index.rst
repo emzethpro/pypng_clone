@@ -1,4 +1,4 @@
-PyPNG Tutorial
+PyPNG Example
 =============
 
 Writing PNG Files

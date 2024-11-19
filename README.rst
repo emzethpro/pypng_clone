@@ -3,7 +3,7 @@
 PNG module for Python. PyPNG is written entirely in Python.
 
 - PyPNG home page: https://gitlab.com/drj11/pypng/
-- PyPNG documentation: https://drj11.gitlab.io/pypng/
+- PyPNG documentation: https://pypng.readthedocs.io/
 - PyPNG mailing list: https://groups.google.com/forum/#!forum/pypng-users
 
 

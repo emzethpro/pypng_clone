@@ -341,6 +341,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   style-guide
    example/index
 
 Additional Resources

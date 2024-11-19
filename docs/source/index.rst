@@ -334,6 +334,15 @@ Best Practices
 5. Handle exceptions appropriately
 6. Test with small images before processing large ones
 
+********
+Contents
+********
+
+.. toctree::
+   :maxdepth: 2
+
+   example/index
+
 Additional Resources
 ------------------
 

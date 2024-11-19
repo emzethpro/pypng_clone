@@ -2,7 +2,7 @@
 
 # -- Project information
 
-project = 'RTA Dubai API'
+project = 'PyPNG'
 copyright = '2024, Patrick'
 author = 'Patrick'
 

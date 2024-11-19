@@ -1,10 +1,5 @@
-PyPNG: A Lightweight Python Library for PNG Files
-=================================================
-
-**PyPNG** is a versatile and pure Python library designed specifically for working with PNG (Portable Network Graphics) image files. Its lightweight implementation and focus on PNG format features make it an ideal choice for developers who need a simple yet powerful tool for reading and writing PNG files.
-
 Why Choose PyPNG?
-------------------
+=================
 
 PyPNG stands out from other libraries because of its focus on the PNG format. Below are some key reasons why you might choose PyPNG for your project:
 

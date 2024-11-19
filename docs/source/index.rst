@@ -343,6 +343,7 @@ Contents
 
    style-guide
    example/index
+   benefit/index
 
 Additional Resources
 ------------------

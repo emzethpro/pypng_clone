@@ -1,3 +1,8 @@
+.. meta::
+    :google-site-verification lang=en:
+        EYDuV6ZNLvsnK3h6HgHyBmKnRc7vzT-UH6bWadAeWrE
+
+
 PyPNG Documentation
 ==================
 

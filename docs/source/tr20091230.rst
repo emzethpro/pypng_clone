@@ -1,0 +1,204 @@
+PNG File Handling Tutorial
+==========================
+
+This tutorial covers a Python implementation of a PNG file handler that can create, manipulate, and write PNG files using custom chunks. The implementation uses the `Chunk` and `adam7` classes, along with `pybin` utilities for byte and data manipulation.
+
+Introduction
+------------
+
+The `File` class is a container for the PNG file structure. It handles:
+- Writing the PNG file header.
+- Adding and manipulating various chunks (e.g., `IHDR`, `gAMA`, `IDAT`).
+- Writing and reading PNG file data.
+
+Code Walkthrough
+----------------
+
+Required Imports
+---------------
+
+The following modules are required for the implementation:
+
+- `Chunk`: Handles the creation and manipulation of PNG file chunks.
+- `adam7`: Implements Adam7 interlacing for PNG files.
+- `pybin`: Provides utilities for data manipulation (e.g., converting integers to bytes).
+
+.. code-block:: python
+
+   from Chunk import Chunk
+   from adam7 import adam7
+   import pybin
+
+Magic Numbers
+---------------
+
+The PNG file signature consists of specific magic numbers:
+.. code-block:: python
+
+   magic_numbers = [137, 80, 78, 71, 13, 10, 26, 10]
+
+The `File` Class
+---------------
+
+Overview
+---------------
+
+The `File` class serves as the main container for the PNG file structure. It provides methods to create and manage PNG file chunks.
+
+Initialization
+---------------
+
+The `__init__` method initializes the file with the PNG signature. Optionally, it can read an existing PNG file.
+
+.. code-block:: python
+
+   class File:
+       _contents = ''
+
+       def __init__(self, ifname=None):
+           for i in magic_numbers:
+               self._contents += pybin.itoc(i)
+           if isinstance(ifname, str):
+               infile = open(ifname, 'r')
+               self._contents = infile.read()
+               infile.close()
+
+#### Creating the `IHDR` Chunk
+
+The `make_IHDR` method creates the image header chunk.
+
+.. code-block:: python
+
+   def make_IHDR(self, width, height, bit_depth, color_type, interlace=False):
+       IHDR = Chunk('IHDR', [])
+       IHDR.append(width, 4)
+       IHDR.append(height, 4)
+       IHDR.append(bit_depth)
+       IHDR.append(color_type)
+       IHDR.append(0)
+       IHDR.append(0)
+       IHDR.append(1 if interlace else 0)
+       self._contents += IHDR.convert()
+
+Adding the `gAMA` Chunk
+---------------
+             
+The `make_gAMA` method creates the gamma chunk.
+
+.. code-block:: python
+
+   def make_gAMA(self, gamma):
+       if gamma is None or not isinstance(gamma, int):
+           return True
+       gAMA = Chunk('gAMA', [])
+       gAMA.append(gamma, 4)
+       self._contents += gAMA.convert()
+       return False
+
+#### Adding the `tRNS` Chunk
+
+The `make_tRNS` method creates the transparency chunk. The format depends on the color type.
+
+.. code-block:: python
+
+   def make_tRNS(self, color, ctype):
+       if ctype in [0, 2]:
+           tRNS = Chunk('tRNS', [])
+           for sample in color:
+               tRNS.append(sample, 2)
+           self._contents += tRNS.convert()
+           return False
+       elif ctype == 3:
+           tRNS = Chunk('tRNS', [])
+           for alphas in color:
+               tRNS.append(alphas, 1)
+           self._contents += tRNS.convert()
+           return False
+       return True
+
+#### Adding the `bKGD` Chunk
+
+The `make_bKGD` method creates the background color chunk.
+
+.. code-block:: python
+
+   def make_bKGD(self, color, ctype):
+       bKGD = None
+       if ctype == 3:
+           bKGD = Chunk('bKGD', [])
+           bKGD.append(color, 1)
+       elif ctype in [0, 4]:
+           bKGD = Chunk('bKGD', [])
+           bKGD.append(color, 2)
+       elif ctype in [2, 6]:
+           bKGD = Chunk('bKGD', [])
+           for i in [0, 1, 2]:
+               bKGD.append(color[i], 2)
+       if bKGD:
+           self._contents += bKGD.convert()
+           return False
+       return True
+
+Adding the `IDAT` Chunk
+---------------
+         
+The `make_IDAT` method handles image data. It supports interlaced and non-interlaced images.
+
+.. code-block:: python
+
+   def make_IDAT(self, image_array, interlace=False):
+       image = adam7(image_array) if interlace else image_array[:]
+       IDAT = Chunk('IDAT', [])
+       for scanlines in image:
+           IDAT.append(0)
+           for pixels in scanlines:
+               for samples in pixels:
+                   IDAT.append(samples)
+       self._contents += IDAT.compress()
+
+#### Adding the `IEND` Chunk
+
+The `make_IEND` method creates the PNG file's end chunk.
+
+.. code-block:: python
+
+   def make_IEND(self):
+       chunk = Chunk('IEND', [])
+       self._contents += chunk.convert()
+
+#### Writing and Reading the File
+
+The `write` method writes the file to disk, while the `read` method reads chunks from a file.
+
+.. code-block:: python
+
+   def write(self, of_name):
+       with open(of_name, 'w') as of:
+           of.write(self._contents)
+
+   def read(self):
+       if self._contents[:8] != '\x89PNG\r\n\x1a\n':
+           print('not a png file')
+           return []
+       if not len(self._contents) > 8:
+           print('no chunks in file')
+           return []
+       contents = self._contents[8:]
+       chunks = []
+       counter = 1
+       while len(contents) > 0:
+           print(f'reading chunk {counter}')
+           counter += 1
+           l = pybin.ntoi(contents[:4])
+           chunk_string = contents[4:12 + l]
+           chunks.append(Chunk().read(chunk_string))
+           contents = contents[12 + l:]
+           if len(contents) > 1 and chunks[-1]._name == 'IEND':
+               print(f'all chunks read, but still have {len(contents)} bytes left to read')
+               break
+       return chunks
+
+Conclusion
+----------
+
+This tutorial demonstrates the structure and functionality of a PNG file handler in Python. You can extend or modify the implementation to support additional PNG features or optimize existing functionality.

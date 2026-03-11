@@ -46,6 +46,45 @@ From Source
 
    python -m pip install .
 
+Automating Python with OpenClaw
+----------------------
+
+There are two primary ways to automate Python with `Openclaw Platform <https://www.emzeth.com/>`_: using the Python SDK for programmatic control, or using the Chat/CLI interface to let the agent run your local Python files.
+
+Method 1: Programmatic Automation (Python SDK)
+----------------------------------------------
+
+This method is ideal if you want to build event-driven applications or embed OpenClaw directly into an existing Python codebase (like Django or FastAPI).
+
+1. **Install the SDK:** Open your terminal and run ``pip install openclaw``.
+2. **Set up your environment:** Ensure you have an active Fast.io account and API key for authentication.
+3. **Initialize the Agent:** Use the following boilerplate to create an agent, give it tools, and run an automated task.
+
+.. code-block:: python
+
+    import openclaw
+
+    # Initialize client
+    client = openclaw.Client(api_key="YOUR_FAST_IO_API_KEY")
+
+    # Create a workspace with persistent memory
+    workspace = client.workspaces.create(
+        name="Python_Automation", 
+        intelligence_mode=True
+    )
+
+    # Create an agent and equip it with tools
+    agent = client.agents.create(
+        name="AutoBot",
+        tools=["python_interpreter", "file_search", "bash"]
+    )
+
+    # Mount the workspace so the agent can save/read files
+    agent.mount_workspace(workspace.id)
+
+    # Execute an automation task (sync or use agent.run_async() for background tasks)
+    agent.run("Write a Python script that pulls data from a public API and saves it as a CSV.")
+
 Basic Usage
 ----------
 
@@ -355,4 +394,3 @@ Additional Resources
 
 * `PyPNG home page <https://gitlab.com/drj11/pypng/>`_
 * `PyPNG mailing list <https://groups.google.com/forum/#!forum/pypng-users>`_
-* `Official documentation <https://drj11.gitlab.io/pypng/>`_
